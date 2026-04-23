@@ -1,5 +1,5 @@
 import uuid
-import pyzipper
+import pyminizip
 import os
 
 def drmID():
@@ -7,11 +7,10 @@ def drmID():
 
 def packageWithID(folder_path, output_zip):
     id = drmID()
-    with pyzipper.AESZipFile(output_zip, 'w', encryption=pyzipper.WZ_AES) as zf:
-        zf.setpassword(str(id).encode())
-        for root, dirs, filenames in os.walk(folder_path):
-            for filename in filenames:
-                filepath = os.path.join(root, filename)
-                arcname = os.path.relpath(filepath, folder_path)  # preserves structure
-                zf.write(filepath, arcname)
+    files = []
+    for root, dirs, filenames in os.walk(folder_path):
+        for filename in filenames:
+            files.append(os.path.join(root, filename))
+    
+    pyminizip.compress_multiple(files, [], output_zip, str(id), 5)
     return id
